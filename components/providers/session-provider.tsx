@@ -31,6 +31,16 @@ export function useSession() {
 	return useContext(SessionContext);
 }
 
+// Alias for useSession with simpler interface
+export function useAuth() {
+	const { session, status } = useContext(SessionContext);
+	return {
+		session,
+		loading: status === "loading",
+		isAuthenticated: status === "authenticated",
+	};
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const [session, setSession] = useState<Session | null>(null);
 	const [status, setStatus] = useState<SessionStatus>("loading");

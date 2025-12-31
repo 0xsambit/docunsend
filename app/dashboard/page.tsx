@@ -1,274 +1,343 @@
 "use client";
 
-import { useSession } from "@/components/providers/session-provider";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-	Activity,
-	ArrowRight,
-	Clock,
-	Download,
-	Eye,
-	Fingerprint,
-	Globe2,
-	Lock,
-	LogOut,
 	Plus,
+	Search,
+	FileText,
+	Link as LinkIcon,
+	BarChart3,
 	Settings,
-	Shield,
-	Upload,
-	Zap,
+	LogOut,
+	Menu,
+	X,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { useEffect } from "react";
+import { UploadModal } from "@/components/upload-modal";
+import { TransferCard } from "@/components/transfer-card";
+import { useAuth } from "@/components/providers/session-provider";
 
-const quickActions = [
-	{
-		title: "New Transfer",
-		description: "Upload files and share securely",
-		icon: <Upload className="w-5 h-5" />,
-		href: "/dashboard/transfers/new",
-	},
-	{
-		title: "Schedule Drop",
-		description: "Set up timed delivery",
-		icon: <Clock className="w-5 h-5" />,
-		href: "/dashboard/transfers/schedule",
-	},
-	{
-		title: "Custom Domain",
-		description: "Brand your links",
-		icon: <Globe2 className="w-5 h-5" />,
-		href: "/dashboard/settings/domains",
-	},
-];
+interface Transfer {
+	id: string;
+	type: "FILE" | "LINK";
+	title: string;
+	description: string | null;
+	status: "DRAFT" | "ACTIVE" | "EXPIRED" | "REVOKED";
+	fileName: string | null;
+	fileSize: number | null;
+	linkTarget: string | null;
+	expiresAt: string | null;
+	maxDownloads: number | null;
+	downloadCount: number;
+	passcodeHash: string | null;
+	viewOnce: boolean;
+	createdAt: string;
+	_count: {
+		accessLogs: number;
+		recipients: number;
+	};
+}
 
-const securityFeatures = [
-	{ icon: <Lock className="w-4 h-4" />, label: "Password Protection", status: "Available" },
-	{ icon: <Eye className="w-4 h-4" />, label: "View-Once Mode", status: "Available" },
-	{ icon: <Fingerprint className="w-4 h-4" />, label: "Device Locking", status: "Available" },
-	{ icon: <Shield className="w-4 h-4" />, label: "Instant Revoke", status: "Available" },
-];
-
-export default function Dashboard() {
-	const { session, status } = useSession();
+export default function DashboardPage() {
+	const { session, loading } = useAuth();
 	const router = useRouter();
+	const [transfers, setTransfers] = useState<Transfer[]>([]);
+	const [loadingTransfers, setLoadingTransfers] = useState(true);
+	const [uploadModalOpen, setUploadModalOpen] = useState(false);
+	const [sidebarOpen, setSidebarOpen] = useState(false);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [statusFilter, setStatusFilter] = useState<string>("all");
 
 	useEffect(() => {
-		if (status === "unauthenticated") {
-			router.push("/api/auth/signin");
+		if (!loading && !session) {
+			router.push("/");
 		}
-	}, [status, router]);
+	}, [session, loading, router]);
 
-	if (status === "loading") {
+	useEffect(() => {
+		if (session) {
+			fetchTransfers();
+		}
+	}, [session]);
+
+	const fetchTransfers = async () => {
+		try {
+			const response = await fetch("/api/transfers");
+			if (response.ok) {
+				const data = await response.json();
+				setTransfers(data.transfers);
+			}
+		} catch (error) {
+			console.error("Failed to fetch transfers:", error);
+		} finally {
+			setLoadingTransfers(false);
+		}
+	};
+
+	const handleDelete = async (id: string) => {
+		if (!confirm("Are you sure you want to delete this transfer?")) return;
+
+		try {
+			const response = await fetch(`/api/transfers/${id}`, {
+				method: "DELETE",
+			});
+			if (response.ok) {
+				setTransfers((prev) => prev.filter((t) => t.id !== id));
+			}
+		} catch (error) {
+			console.error("Failed to delete transfer:", error);
+		}
+	};
+
+	const handleRevoke = async (id: string) => {
+		try {
+			const response = await fetch(`/api/transfers/${id}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ status: "REVOKED" }),
+			});
+			if (response.ok) {
+				setTransfers((prev) =>
+					prev.map((t) => (t.id === id ? { ...t, status: "REVOKED" } : t))
+				);
+			}
+		} catch (error) {
+			console.error("Failed to revoke transfer:", error);
+		}
+	};
+
+	const handleSignOut = async () => {
+		await fetch("/api/auth/signout", { method: "POST" });
+		router.push("/");
+	};
+
+	const filteredTransfers = transfers.filter((t) => {
+		const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase());
+		const matchesStatus = statusFilter === "all" || t.status === statusFilter.toUpperCase();
+		return matchesSearch && matchesStatus;
+	});
+
+	const stats = {
+		total: transfers.length,
+		active: transfers.filter((t) => t.status === "ACTIVE").length,
+		totalViews: transfers.reduce((sum, t) => sum + t._count.accessLogs, 0),
+		totalDownloads: transfers.reduce((sum, t) => sum + t.downloadCount, 0),
+	};
+
+	if (loading) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
-				<div className="animate-pulse flex items-center gap-3">
-					<div className="w-8 h-8 rounded-lg bg-[var(--primary)]/20"></div>
-					<span className="text-[var(--muted)]">Loading...</span>
-				</div>
+				<div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
 			</div>
 		);
 	}
 
-	if (!session?.user) {
-		return null;
-	}
-
 	return (
-		<div className="app-shell min-h-screen">
-			<div className="hero-gradient opacity-50" aria-hidden />
-
-			{/* Header */}
-			<header className="relative z-10 mx-auto max-w-6xl px-6 pt-6">
-				<div className="flex items-center justify-between rounded-2xl card px-6 py-4">
-					<div className="flex items-center gap-4">
-						<Link href="/" className="flex items-center gap-2">
-							<div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] flex items-center justify-center">
-								<Zap className="w-4 h-4 text-white" />
-							</div>
-							<span className="font-bold text-lg">DocuNsend</span>
-						</Link>
-					</div>
-					<div className="flex items-center gap-3">
-						<div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--bg-strong)] text-sm">
-							<div className="w-6 h-6 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] flex items-center justify-center text-white text-xs font-bold">
-								{session.user.name?.charAt(0) ||
-									session.user.email?.charAt(0) ||
-									"U"}
-							</div>
-							<span className="text-[var(--muted)]">{session.user.email}</span>
-						</div>
-						<ThemeToggle />
-						<a href="/api/auth/signout" className="btn btn-ghost text-sm">
-							<LogOut className="w-4 h-4" />
-							<span className="hidden sm:inline">Sign out</span>
-						</a>
-					</div>
+		<div className="min-h-screen bg-surface">
+			{/* Mobile Header */}
+			<header className="lg:hidden sticky top-0 z-40 bg-surface-raised border-b border-border px-4 py-3">
+				<div className="flex items-center justify-between">
+					<button
+						onClick={() => setSidebarOpen(true)}
+						className="p-2 hover:bg-surface-hover rounded-lg">
+						<Menu className="w-5 h-5" />
+					</button>
+					<Link href="/dashboard" className="font-bold text-lg">
+						Docunsend
+					</Link>
+					<ThemeToggle />
 				</div>
 			</header>
 
-			{/* Main Content */}
-			<main className="relative z-10 mx-auto max-w-6xl px-6 py-12">
-				{/* Welcome Section */}
-				<section className="mb-12">
-					<h1 className="text-3xl sm:text-4xl font-bold mb-2">
-						Welcome back, {session.user.name?.split(" ")[0] || "friend"} 👋
-					</h1>
-					<p className="text-lg text-[var(--muted)]">
-						All premium features unlocked. No limits. No restrictions.
-					</p>
-				</section>
-
-				{/* Quick Actions */}
-				<section className="mb-12">
-					<h2 className="text-xl font-semibold mb-6">Quick Actions</h2>
-					<div className="grid sm:grid-cols-3 gap-5">
-						{quickActions.map((action) => (
-							<Link
-								key={action.title}
-								href={action.href}
-								className="card card-hover p-6 flex items-start gap-4">
-								<div className="w-12 h-12 rounded-xl bg-[var(--primary)]/10 flex items-center justify-center text-[var(--primary)] shrink-0">
-									{action.icon}
-								</div>
-								<div>
-									<h3 className="font-semibold mb-1">{action.title}</h3>
-									<p className="text-sm text-[var(--muted)]">
-										{action.description}
-									</p>
-								</div>
-								<ArrowRight className="w-5 h-5 text-[var(--muted)] ml-auto" />
-							</Link>
-						))}
+			{/* Sidebar */}
+			<aside
+				className={`fixed inset-y-0 left-0 z-50 w-64 bg-surface-raised border-r border-border transform transition-transform lg:translate-x-0 ${
+					sidebarOpen ? "translate-x-0" : "-translate-x-full"
+				}`}>
+				<div className="flex flex-col h-full">
+					{/* Logo */}
+					<div className="flex items-center justify-between px-6 py-5 border-b border-border">
+						<Link href="/dashboard" className="font-bold text-xl">
+							Docunsend
+						</Link>
+						<button
+							onClick={() => setSidebarOpen(false)}
+							className="lg:hidden p-1 hover:bg-surface-hover rounded">
+							<X className="w-5 h-5" />
+						</button>
 					</div>
-				</section>
 
-				{/* Main Grid */}
-				<div className="grid lg:grid-cols-[1.5fr_1fr] gap-6">
-					{/* Transfers Section */}
-					<section className="card p-6 space-y-6">
-						<div className="flex items-center justify-between">
-							<div>
-								<h2 className="text-xl font-semibold">Recent Transfers</h2>
-								<p className="text-sm text-[var(--muted)]">
-									Your file sharing activity
-								</p>
-							</div>
-							<Link
-								href="/dashboard/transfers/new"
-								className="btn btn-primary">
-								<Plus className="w-4 h-4" />
-								New Transfer
-							</Link>
-						</div>
-
-						<div className="divider" />
-
-						{/* Empty State */}
-						<div className="py-12 text-center">
-							<div className="w-16 h-16 rounded-2xl bg-[var(--bg-strong)] flex items-center justify-center mx-auto mb-4">
-								<Download className="w-8 h-8 text-[var(--muted)]" />
-							</div>
-							<h3 className="font-semibold text-lg mb-2">No transfers yet</h3>
-							<p className="text-[var(--muted)] mb-6 max-w-sm mx-auto">
-								Create your first transfer to start sharing files securely
-								with all premium features.
-							</p>
-							<Link
-								href="/dashboard/transfers/new"
-								className="btn btn-secondary">
-								Create your first transfer
-								<ArrowRight className="w-4 h-4" />
-							</Link>
-						</div>
-					</section>
-
-					{/* Sidebar */}
-					<div className="space-y-6">
-						{/* Security Features */}
-						<section className="card p-6 space-y-4">
-							<div className="flex items-center justify-between">
-								<h3 className="font-semibold">Security Features</h3>
-								<Shield className="w-5 h-5 text-[var(--primary)]" />
-							</div>
-							<div className="space-y-3">
-								{securityFeatures.map((feature) => (
-									<div
-										key={feature.label}
-										className="flex items-center justify-between py-2 border-b border-[var(--border)] last:border-0">
-										<div className="flex items-center gap-3 text-sm">
-											<span className="text-[var(--primary)]">
-												{feature.icon}
-											</span>
-											{feature.label}
-										</div>
-										<span className="text-xs font-medium text-[var(--success)] bg-[var(--success)]/10 px-2 py-1 rounded-full">
-											{feature.status}
-										</span>
-									</div>
-								))}
-							</div>
-						</section>
-
-						{/* Analytics Preview */}
-						<section className="card p-6 space-y-4">
-							<div className="flex items-center justify-between">
-								<h3 className="font-semibold">Analytics</h3>
-								<Activity className="w-5 h-5 text-[var(--accent)]" />
-							</div>
-							<div className="grid grid-cols-2 gap-4">
-								<div className="p-4 rounded-xl bg-[var(--bg-strong)]">
-									<p className="text-2xl font-bold">0</p>
-									<p className="text-sm text-[var(--muted)]">
-										Total Views
-									</p>
-								</div>
-								<div className="p-4 rounded-xl bg-[var(--bg-strong)]">
-									<p className="text-2xl font-bold">0</p>
-									<p className="text-sm text-[var(--muted)]">
-										Downloads
-									</p>
-								</div>
-							</div>
-							<p className="text-sm text-[var(--muted)]">
-								Real-time analytics will appear here once you start sharing.
-							</p>
-						</section>
-
-						{/* Settings Link */}
+					{/* Navigation */}
+					<nav className="flex-1 px-4 py-6 space-y-1">
+						<Link
+							href="/dashboard"
+							className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-accent/10 text-accent font-medium">
+							<FileText className="w-5 h-5" />
+							Transfers
+						</Link>
+						<Link
+							href="/dashboard/analytics"
+							className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-muted hover:bg-surface-hover hover:text-foreground transition-colors">
+							<BarChart3 className="w-5 h-5" />
+							Analytics
+						</Link>
 						<Link
 							href="/dashboard/settings"
-							className="card card-hover p-6 flex items-center gap-4">
-							<div className="w-10 h-10 rounded-xl bg-[var(--bg-strong)] flex items-center justify-center">
-								<Settings className="w-5 h-5 text-[var(--muted)]" />
-							</div>
-							<div className="flex-1">
-								<h3 className="font-semibold">Settings</h3>
-								<p className="text-sm text-[var(--muted)]">
-									Manage your account
+							className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-muted hover:bg-surface-hover hover:text-foreground transition-colors">
+							<Settings className="w-5 h-5" />
+							Settings
+						</Link>
+					</nav>
+
+					{/* User */}
+					<div className="px-4 py-4 border-t border-border">
+						<div className="flex items-center gap-3 mb-4">
+							{session?.user?.image ? (
+								<img
+									src={session.user.image}
+									alt=""
+									className="w-10 h-10 rounded-full"
+								/>
+							) : (
+								<div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+									<span className="text-accent font-medium">
+										{session?.user?.email?.charAt(0).toUpperCase()}
+									</span>
+								</div>
+							)}
+							<div className="flex-1 min-w-0">
+								<p className="font-medium truncate">
+									{session?.user?.name || "User"}
+								</p>
+								<p className="text-xs text-muted truncate">
+									{session?.user?.email}
 								</p>
 							</div>
-							<ArrowRight className="w-5 h-5 text-[var(--muted)]" />
-						</Link>
+						</div>
+						<div className="flex items-center gap-2">
+							<ThemeToggle />
+							<button
+								onClick={handleSignOut}
+								className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm text-muted hover:text-foreground hover:bg-surface-hover rounded-lg transition-colors">
+								<LogOut className="w-4 h-4" />
+								Sign out
+							</button>
+						</div>
 					</div>
+				</div>
+			</aside>
+
+			{/* Mobile sidebar overlay */}
+			{sidebarOpen && (
+				<div
+					className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+					onClick={() => setSidebarOpen(false)}
+				/>
+			)}
+
+			{/* Main Content */}
+			<main className="lg:ml-64">
+				<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+					{/* Stats */}
+					<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+						<div className="bg-surface-raised border border-border rounded-xl p-4">
+							<p className="text-sm text-muted">Total Transfers</p>
+							<p className="text-2xl font-bold mt-1">{stats.total}</p>
+						</div>
+						<div className="bg-surface-raised border border-border rounded-xl p-4">
+							<p className="text-sm text-muted">Active</p>
+							<p className="text-2xl font-bold mt-1 text-green-400">
+								{stats.active}
+							</p>
+						</div>
+						<div className="bg-surface-raised border border-border rounded-xl p-4">
+							<p className="text-sm text-muted">Total Views</p>
+							<p className="text-2xl font-bold mt-1 text-accent">
+								{stats.totalViews}
+							</p>
+						</div>
+						<div className="bg-surface-raised border border-border rounded-xl p-4">
+							<p className="text-sm text-muted">Downloads</p>
+							<p className="text-2xl font-bold mt-1">{stats.totalDownloads}</p>
+						</div>
+					</div>
+
+					{/* Header */}
+					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+						<h1 className="text-2xl font-bold">Transfers</h1>
+						<button
+							onClick={() => setUploadModalOpen(true)}
+							className="flex items-center justify-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg font-medium hover:bg-accent/90 transition-colors">
+							<Plus className="w-5 h-5" />
+							New Transfer
+						</button>
+					</div>
+
+					{/* Filters */}
+					<div className="flex flex-col sm:flex-row gap-4 mb-6">
+						<div className="relative flex-1">
+							<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted" />
+							<input
+								type="text"
+								placeholder="Search transfers..."
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								className="w-full pl-10 pr-4 py-2.5 bg-surface-raised border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+							/>
+						</div>
+						<select
+							value={statusFilter}
+							onChange={(e) => setStatusFilter(e.target.value)}
+							className="px-4 py-2.5 bg-surface-raised border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent">
+							<option value="all">All Status</option>
+							<option value="active">Active</option>
+							<option value="expired">Expired</option>
+							<option value="revoked">Revoked</option>
+						</select>
+					</div>
+
+					{/* Transfers List */}
+					{loadingTransfers ? (
+						<div className="flex items-center justify-center py-12">
+							<div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+						</div>
+					) : filteredTransfers.length === 0 ? (
+						<div className="text-center py-12">
+							<FileText className="w-12 h-12 mx-auto text-muted mb-4" />
+							<h3 className="text-lg font-medium mb-2">No transfers yet</h3>
+							<p className="text-muted mb-6">
+								Create your first secure transfer to get started
+							</p>
+							<button
+								onClick={() => setUploadModalOpen(true)}
+								className="inline-flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg font-medium hover:bg-accent/90 transition-colors">
+								<Plus className="w-5 h-5" />
+								New Transfer
+							</button>
+						</div>
+					) : (
+						<div className="space-y-3">
+							{filteredTransfers.map((transfer) => (
+								<TransferCard
+									key={transfer.id}
+									transfer={transfer}
+									onDelete={handleDelete}
+									onRevoke={handleRevoke}
+								/>
+							))}
+						</div>
+					)}
 				</div>
 			</main>
 
-			{/* Footer */}
-			<footer className="relative z-10 mx-auto max-w-6xl px-6 py-8 mt-12 border-t border-[var(--border)]">
-				<div className="flex items-center justify-between text-sm text-[var(--muted)]">
-					<p>DocuNsend · All features free, forever</p>
-					<div className="flex items-center gap-4">
-						<Link href="#" className="link-underline">
-							Help
-						</Link>
-						<Link href="#" className="link-underline">
-							Privacy
-						</Link>
-					</div>
-				</div>
-			</footer>
+			{/* Upload Modal */}
+			<UploadModal
+				isOpen={uploadModalOpen}
+				onClose={() => setUploadModalOpen(false)}
+				onSuccess={fetchTransfers}
+			/>
 		</div>
 	);
 }
