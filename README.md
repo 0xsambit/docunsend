@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## DosSend (all premium features, free)
 
-## Getting Started
+Build a full DosSend-equivalent with every premium control unlocked: secure file/link drops, expiries, passcodes, device locks, scheduling, analytics, custom domains, and instant revokes. Auth-gated, Prisma-backed, Vercel-ready.
 
-First, run the development server:
+### Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+-    Next.js 16 (App Router) + React 19
+-    Tailwind v4 (inline theme tokens) + custom dual-theme styling
+-    Prisma + PostgreSQL (Vercel Postgres ready)
+-    Auth.js (NextAuth v5 beta) for OAuth/email auth
+
+### Core features
+
+-    Unlimited transfers: files or smart links, no throttling
+-    Premium security: passcodes, view-once, device fingerprint allow/deny, geo/IP insights, instant revoke
+-    Controls: expiries, download caps, scheduled go-live, allow/deny resharing
+-    Custom domains + branding presets
+-    Analytics: opens/downloads, devices, locations, blocked attempts
+-    Dashboard: manage transfers, recipients, devices, domains
+
+### Getting started
+
+1. Install deps
+
+```
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Copy envs and fill values
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+    - Set DATABASE_URL (Postgres), NEXTAUTH_SECRET, NEXTAUTH_URL
+    - For email login, set AUTH_EMAIL_SERVER and AUTH_EMAIL_FROM
+    - Add optional OAuth keys (GitHub/Google)
 
-## Learn More
+3. Generate Prisma client and sync schema
 
-To learn more about Next.js, take a look at the following resources:
+```
+npm run db:generate
+npm run db:push
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Run dev server
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+npm run dev
+```
 
-## Deploy on Vercel
+### Deployment (Vercel)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+-    Add DATABASE_URL, NEXTAUTH_URL, NEXTAUTH_SECRET, and provider secrets to Vercel project envs.
+-    Provision Vercel Postgres (or point to external Postgres) and run `npm run db:push` (or migrations) via Vercel CLI.
+-    Connect custom domain(s) in app settings; DNS/verification handled per workspace domain model.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Roadmap (initial cut)
+
+-    Auth wiring (email magic + OAuth)
+-    Dashboard UX: transfers, recipients, analytics
+-    Upload pipeline (Vercel Blob or S3), passcode hashing, device fingerprinting
+-    Rate limiting + background cleanup of expired/revoked artifacts

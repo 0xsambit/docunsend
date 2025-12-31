@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Plan {
+  FREE
+  PREMIUM
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum TransferType {
+  FILE
+  LINK
+}
+
+enum TransferStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+enum DeliveryChannel {
+  LINK
+  EMAIL
+}
+
+enum RecipientStatus {
+  PENDING
+  SENT
+  OPENED
+  COMPLETED
+  BLOCKED
+}
+
+enum AccessEvent {
+  VIEW
+  DOWNLOAD
+  BLOCKED
+}
+
+model User {
+  id         String             @id @default(cuid())
+  email      String             @unique
+  name       String?
+  image      String?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  accounts   Account[]
+  sessions   Session[]
+  memberships WorkspaceMember[]
+  transfers  Transfer[]
+}
+
+model Account {
+  id                 String   @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Workspace {
+  id         String             @id @default(cuid())
+  name       String
+  slug       String             @unique
+  plan       Plan               @default(PREMIUM)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  members    WorkspaceMember[]
+  transfers  Transfer[]
+  domains    WorkspaceDomain[]
+  branding   Branding?
+}
+
+model WorkspaceMember {
+  id           String   @id @default(cuid())
+  workspaceId  String
+  userId       String
+  role         Role     @default(MEMBER)
+  invitedById  String?
+  createdAt    DateTime @default(now())
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy    User?     @relation("InvitedBy", fields: [invitedById], references: [id])
+
+  @@unique([workspaceId, userId])
+}
+
+model Transfer {
+  id              String           @id @default(cuid())
+  workspaceId     String
+  creatorId       String
+  type            TransferType
+  title           String
+  description     String?
+  status          TransferStatus   @default(DRAFT)
+  storageKey      String?
+  storageProvider String?
+  fileName        String?
+  fileSize        Int?
+  linkTarget      String?
+  expiresAt       DateTime?
+  scheduledFor    DateTime?
+  maxDownloads    Int?             @default(1)
+  downloadCount   Int              @default(0)
+  passcodeHash    String?
+  viewOnce        Boolean          @default(false)
+  allowReshare    Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  revokedAt       DateTime?
+  workspace       Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator         User             @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  recipients      Recipient[]
+  accessLogs      AccessLog[]
+  deviceLocks     DeviceLock[]
+}
+
+model Recipient {
+  id           String           @id @default(cuid())
+  transferId   String
+  channel      DeliveryChannel  @default(LINK)
+  address      String?
+  status       RecipientStatus  @default(PENDING)
+  sentAt       DateTime?
+  openedAt     DateTime?
+  completedAt  DateTime?
+  blockedAt    DateTime?
+  transfer     Transfer         @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  accessLogs   AccessLog[]
+}
+
+model DeviceLock {
+  id          String    @id @default(cuid())
+  transferId  String
+  label       String?
+  fingerprint String
+  userAgent   String?
+  allowed     Boolean   @default(true)
+  lastSeenAt  DateTime? 
+  transfer    Transfer  @relation(fields: [transferId], references: [id], onDelete: Cascade)
+
+  @@unique([transferId, fingerprint])
+}
+
+model AccessLog {
+  id           String       @id @default(cuid())
+  transferId   String
+  recipientId  String?
+  event        AccessEvent
+  ip           String?
+  country      String?
+  userAgent    String?
+  allowed      Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  transfer     Transfer     @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  recipient    Recipient?   @relation(fields: [recipientId], references: [id])
+}
+
+model WorkspaceDomain {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  hostname     String    @unique
+  verifiedAt   DateTime?
+  status       String    @default("pending")
+  createdAt    DateTime  @default(now())
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model Branding {
+  id             String    @id @default(cuid())
+  workspaceId    String    @unique
+  primaryColor   String    @default("#4f46e5")
+  accentColor    String    @default("#22d3ee")
+  background     String    @default("#0b1224")
+  logoUrl        String?
+  coverUrl       String?
+  workspace      Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
