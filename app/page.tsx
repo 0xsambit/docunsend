@@ -34,7 +34,8 @@ const features = [
 	{
 		icon: <FileText className="w-5 h-5" />,
 		title: "Drag & Drop Upload",
-		description: "Upload any file type instantly. PDFs, docs, images, videos—we handle it all.",
+		description:
+			"Upload any file type instantly. PDFs, docs, images, videos—we handle it all.",
 		color: "from-blue-500 to-cyan-500",
 	},
 	{
@@ -58,7 +59,8 @@ const features = [
 	{
 		icon: <Eye className="w-5 h-5" />,
 		title: "View-Once Mode",
-		description: "Self-destructing files. After one view, they're gone. Perfect for sensitive data.",
+		description:
+			"Self-destructing files. After one view, they're gone. Perfect for sensitive data.",
 		color: "from-rose-500 to-pink-500",
 	},
 	{
@@ -73,7 +75,8 @@ const useCases = [
 	{
 		icon: <Users className="w-6 h-6" />,
 		title: "Founders & Startups",
-		description: "Share pitch decks with investors. Track who's interested by their engagement.",
+		description:
+			"Share pitch decks with investors. Track who's interested by their engagement.",
 	},
 	{
 		icon: <FileText className="w-6 h-6" />,
@@ -83,12 +86,14 @@ const useCases = [
 	{
 		icon: <Mail className="w-6 h-6" />,
 		title: "Sales Teams",
-		description: "Share proposals and know exactly when prospects open them. Perfect timing for follow-ups.",
+		description:
+			"Share proposals and know exactly when prospects open them. Perfect timing for follow-ups.",
 	},
 	{
 		icon: <Sparkles className="w-6 h-6" />,
 		title: "Creators & Agencies",
-		description: "Deliver client work securely. Get notified the moment they view your deliverables.",
+		description:
+			"Deliver client work securely. Get notified the moment they view your deliverables.",
 	},
 ];
 
@@ -128,17 +133,25 @@ export default function HomePage() {
 							<div className="w-9 h-9 rounded-xl bg-linear-to-br from-accent via-cyan-500 to-accent flex items-center justify-center shadow-lg shadow-accent/25 group-hover:shadow-accent/40 transition-shadow">
 								<Zap className="w-5 h-5 text-white" />
 							</div>
-							<span className="font-bold text-xl tracking-tight">Docunsend</span>
+							<span className="font-bold text-xl tracking-tight">
+								Docunsend
+							</span>
 						</Link>
 
 						<nav className="hidden md:flex items-center gap-8">
-							<Link href="#features" className="text-sm text-muted hover:text-foreground transition-colors">
+							<Link
+								href="#features"
+								className="text-sm text-muted hover:text-foreground transition-colors">
 								Features
 							</Link>
-							<Link href="#how-it-works" className="text-sm text-muted hover:text-foreground transition-colors">
+							<Link
+								href="#how-it-works"
+								className="text-sm text-muted hover:text-foreground transition-colors">
 								How it Works
 							</Link>
-							<Link href="#use-cases" className="text-sm text-muted hover:text-foreground transition-colors">
+							<Link
+								href="#use-cases"
+								className="text-sm text-muted hover:text-foreground transition-colors">
 								Use Cases
 							</Link>
 						</nav>
@@ -188,9 +201,9 @@ export default function HomePage() {
 
 						{/* Subheadline */}
 						<p className="text-lg sm:text-xl text-muted mb-10 max-w-2xl mx-auto leading-relaxed">
-							Track who views your documents, protect them with passwords, 
-							set expiry dates, and get real-time analytics. 
-							No subscriptions. No limits. Completely free.
+							Track who views your documents, protect them with passwords, set
+							expiry dates, and get real-time analytics. No subscriptions. No
+							limits. Completely free.
 						</p>
 
 						{/* CTA Group */}
@@ -213,7 +226,9 @@ export default function HomePage() {
 						<div className="grid grid-cols-2 sm:grid-cols-4 gap-8 max-w-3xl mx-auto">
 							{stats.map((stat) => (
 								<div key={stat.label} className="text-center">
-									<div className="text-2xl sm:text-3xl font-bold text-accent mb-1">{stat.value}</div>
+									<div className="text-2xl sm:text-3xl font-bold text-accent mb-1">
+										{stat.value}
+									</div>
 									<div className="text-sm text-muted">{stat.label}</div>
 								</div>
 							))}
@@ -227,9 +242,15 @@ export default function HomePage() {
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<p className="text-center text-sm text-muted mb-6">Trusted by teams at</p>
 					<div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4 opacity-50">
-						{["Startups", "Agencies", "Law Firms", "Sales Teams", "Founders"].map((name) => (
-							<span key={name} className="text-lg font-semibold tracking-wide">{name}</span>
-						))}
+						{["Startups", "Agencies", "Law Firms", "Sales Teams", "Founders"].map(
+							(name) => (
+								<span
+									key={name}
+									className="text-lg font-semibold tracking-wide">
+									{name}
+								</span>
+							)
+						)}
 					</div>
 				</div>
 			</section>
@@ -254,11 +275,16 @@ export default function HomePage() {
 							<div
 								key={feature.title}
 								className="group relative bg-surface-raised border border-border rounded-2xl p-6 hover:border-accent/30 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-accent/5">
-								<div className={`w-12 h-12 rounded-xl bg-linear-to-br ${feature.color} flex items-center justify-center mb-5 shadow-lg`}>
+								<div
+									className={`w-12 h-12 rounded-xl bg-linear-to-br ${feature.color} flex items-center justify-center mb-5 shadow-lg`}>
 									<span className="text-white">{feature.icon}</span>
 								</div>
-								<h3 className="text-lg font-semibold mb-2 group-hover:text-accent transition-colors">{feature.title}</h3>
-								<p className="text-muted leading-relaxed">{feature.description}</p>
+								<h3 className="text-lg font-semibold mb-2 group-hover:text-accent transition-colors">
+									{feature.title}
+								</h3>
+								<p className="text-muted leading-relaxed">
+									{feature.description}
+								</p>
 							</div>
 						))}
 					</div>
@@ -286,7 +312,9 @@ export default function HomePage() {
 								{index < howItWorks.length - 1 && (
 									<div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-linear-to-r from-border to-transparent" />
 								)}
-								<div className="text-5xl font-bold text-accent/20 mb-4">{item.step}</div>
+								<div className="text-5xl font-bold text-accent/20 mb-4">
+									{item.step}
+								</div>
 								<h3 className="text-lg font-semibold mb-2">{item.title}</h3>
 								<p className="text-muted">{item.description}</p>
 							</div>
@@ -306,7 +334,8 @@ export default function HomePage() {
 							Built for professionals
 						</h2>
 						<p className="text-lg text-muted max-w-2xl mx-auto">
-							From pitch decks to contracts, know when your documents get attention.
+							From pitch decks to contracts, know when your documents get
+							attention.
 						</p>
 					</div>
 
@@ -319,7 +348,9 @@ export default function HomePage() {
 									{useCase.icon}
 								</div>
 								<div>
-									<h3 className="text-lg font-semibold mb-1">{useCase.title}</h3>
+									<h3 className="text-lg font-semibold mb-1">
+										{useCase.title}
+									</h3>
 									<p className="text-muted">{useCase.description}</p>
 								</div>
 							</div>
@@ -334,21 +365,28 @@ export default function HomePage() {
 					<div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-accent via-accent to-cyan-500 p-12 sm:p-16 text-center">
 						{/* Background pattern */}
 						<div className="absolute inset-0 opacity-10">
-							<div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
+							<div
+								className="absolute inset-0"
+								style={{
+									backgroundImage:
+										"radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
+									backgroundSize: "32px 32px",
+								}}
+							/>
 						</div>
-						
+
 						<div className="relative">
 							<div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 text-white text-sm font-medium mb-6 backdrop-blur-sm">
 								<MousePointerClick className="w-4 h-4" />
 								No credit card required
 							</div>
-							
+
 							<h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
 								Ready to take control?
 							</h2>
 							<p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-								Stop wondering if your files were seen. Start knowing.
-								Join thousands already sharing smarter.
+								Stop wondering if your files were seen. Start knowing. Join
+								thousands already sharing smarter.
 							</p>
 
 							<div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -389,11 +427,23 @@ export default function HomePage() {
 							</div>
 							<span className="font-bold text-lg">Docunsend</span>
 						</div>
-						
+
 						<div className="flex items-center gap-6 text-sm text-muted">
-							<Link href="#features" className="hover:text-foreground transition-colors">Features</Link>
-							<Link href="#how-it-works" className="hover:text-foreground transition-colors">How it Works</Link>
-							<Link href="#use-cases" className="hover:text-foreground transition-colors">Use Cases</Link>
+							<Link
+								href="#features"
+								className="hover:text-foreground transition-colors">
+								Features
+							</Link>
+							<Link
+								href="#how-it-works"
+								className="hover:text-foreground transition-colors">
+								How it Works
+							</Link>
+							<Link
+								href="#use-cases"
+								className="hover:text-foreground transition-colors">
+								Use Cases
+							</Link>
 						</div>
 
 						<p className="text-sm text-muted">
