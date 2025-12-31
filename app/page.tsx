@@ -1,428 +1,340 @@
 import Link from "next/link";
 import {
-	Activity,
-	AlarmClock,
-	ArrowUpRight,
-	Download,
-	Fingerprint,
-	Globe2,
-	Link2,
-	Lock,
-	MousePointerClick,
-	ShieldCheck,
-	Sparkles,
+  ArrowUpRight,
+  Lock,
+  Eye,
+  Fingerprint,
+  Activity,
+  Clock,
+  Globe2,
+  Shield,
+  FileText,
+  Send,
+  BarChart3,
+  Zap,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-const featureCards = [
-	{
-		title: "Instant, no limits",
-		description:
-			"Upload heavy files or generate secure links without paywalls or throttling.",
-		icon: <Download size={18} />,
-	},
-	{
-		title: "Time + device locks",
-		description: "Expiry windows, view-once, passcodes, and device fingerprinting baked in.",
-		icon: <Lock size={18} />,
-	},
-	{
-		title: "Scheduling",
-		description: "Prep drops ahead of time and let them go live automatically.",
-		icon: <AlarmClock size={18} />,
-	},
-	{
-		title: "Analytics",
-		description: "See opens, downloads, locations, devices, and block risky attempts.",
-		icon: <Activity size={18} />,
-	},
-	{
-		title: "Custom domains",
-		description: "Ship from your own hostname with branded colors and preview cards.",
-		icon: <Globe2 size={18} />,
-	},
-	{
-		title: "One-click revoke",
-		description: "Kill a transfer instantly or rotate a fresh, tamper-proof link.",
-		icon: <ShieldCheck size={18} />,
-	},
+const navLinks = [
+  { label: "Features", href: "#features" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "Compare", href: "#compare" },
+  { label: "Docs", href: "#docs" },
 ];
 
-const workflow = [
-	{
-		title: "Authenticate",
-		description: "Sign in once; every premium control is unlocked by default.",
-	},
-	{
-		title: "Configure",
-		description:
-			"Upload files or paste links, set expiries, passcodes, devices, and domains.",
-	},
-	{
-		title: "Share + monitor",
-		description: "Send to contacts or share a smart link while analytics watch in real time.",
-	},
+const floatingCards = [
+  {
+    title: "SECURITY",
+    items: [
+      { icon: "🔐", name: "Passcodes" },
+      { icon: "👁️", name: "View-once" },
+      { icon: "🔒", name: "Encryption" },
+    ],
+  },
+  {
+    title: "ANALYTICS",
+    items: [
+      { icon: "📊", name: "Real-time" },
+      { icon: "🌍", name: "Geo-tracking" },
+      { icon: "📱", name: "Device info" },
+    ],
+  },
+  {
+    title: "CONTROLS",
+    items: [
+      { icon: "⏰", name: "Expiry" },
+      { icon: "🚫", name: "Revoke" },
+      { icon: "🔗", name: "Custom links" },
+    ],
+  },
+  {
+    title: "BRANDING",
+    items: [
+      { icon: "🌐", name: "Domains" },
+      { icon: "🎨", name: "Themes" },
+      { icon: "✉️", name: "Emails" },
+    ],
+  },
 ];
 
-const security = [
-	"Passcodes + view-once",
-	"Device fingerprint allow/deny",
-	"Geo/IP insights + throttling",
-	"Instant revoke + versioned links",
+const features = [
+  {
+    icon: <Lock className="w-5 h-5" />,
+    title: "Password Protection",
+    description: "Add passcodes to any file. Enterprise security, zero cost.",
+  },
+  {
+    icon: <Eye className="w-5 h-5" />,
+    title: "View-Once Mode",
+    description: "Files disappear after viewing. Like they never existed.",
+  },
+  {
+    icon: <Fingerprint className="w-5 h-5" />,
+    title: "Device Locking",
+    description: "Whitelist or blacklist specific devices from accessing files.",
+  },
+  {
+    icon: <Activity className="w-5 h-5" />,
+    title: "Real-Time Analytics",
+    description: "See who opened what, when, and where. Every single time.",
+  },
+  {
+    icon: <Clock className="w-5 h-5" />,
+    title: "Expiring Links",
+    description: "Set time limits. After expiry, the link is dead forever.",
+  },
+  {
+    icon: <Globe2 className="w-5 h-5" />,
+    title: "Custom Domains",
+    description: "Use your own domain. share.yourcompany.com looks better.",
+  },
+  {
+    icon: <Shield className="w-5 h-5" />,
+    title: "Instant Revoke",
+    description: "One click to kill any link. No questions, no delays.",
+  },
+  {
+    icon: <Send className="w-5 h-5" />,
+    title: "Scheduled Drops",
+    description: "Set files to go live at a specific time. Automate everything.",
+  },
 ];
+
+const logos = ["Startups", "Agencies", "Freelancers", "Enterprise", "Legal", "Finance"];
 
 export default function Home() {
-	return (
-		<main className="relative isolate overflow-hidden pb-24">
-			<div className="pointer-events-none absolute inset-0 glow-grid" aria-hidden />
+  return (
+    <div className="app-shell">
+      {/* Grid Background */}
+      <div className="grid-bg" aria-hidden />
+      <div className="hero-gradient" aria-hidden />
 
-			<div className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 pt-12 sm:px-10">
-				<header className="flex items-center justify-between gap-6 rounded-2xl border border-[color:var(--border)] bg-[color:var(--bg-elevated)]/70 px-6 py-4 shadow-lg">
-					<div className="flex items-center gap-3">
-						<div className="pill flex items-center gap-2 px-3 py-1 text-xs uppercase tracking-[0.2em] text-[color:var(--muted)]">
-							<Sparkles size={14} />
-							Premium Unlocked
-						</div>
-						<span className="text-sm text-[color:var(--muted)]">
-							DosSend • free forever
-						</span>
-					</div>
-					<div className="flex items-center gap-3">
-						<Link
-							className="pill hidden items-center gap-2 px-4 py-2 text-sm font-semibold text-[color:var(--fg)] transition hover:border-primary hover:text-[color:var(--primary)] sm:inline-flex"
-							href="#roadmap">
-							Roadmap
-							<ArrowUpRight size={16} />
-						</Link>
-						<ThemeToggle />
-					</div>
-				</header>
+      {/* Navigation */}
+      <nav className="relative z-10 mx-auto max-w-7xl px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-10">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
+                <Zap className="w-4 h-4 text-black" />
+              </div>
+              <span className="font-semibold text-lg hidden sm:block">DocuNsend</span>
+            </Link>
+            <div className="hidden md:flex items-center gap-1">
+              {navLinks.map((link) => (
+                <Link key={link.label} href={link.href} className="btn btn-ghost">
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Link href="/dashboard" className="btn btn-ghost hidden sm:flex">
+              Log in
+            </Link>
+            <Link href="/dashboard" className="btn btn-primary">
+              Try DocuNsend free
+            </Link>
+          </div>
+        </div>
+      </nav>
 
-				<section className="grid gap-12 lg:grid-cols-[1.3fr_1fr]">
-					<div className="flex flex-col gap-8">
-						<p className="pill w-fit text-xs font-semibold uppercase tracking-[0.28em] text-[color:var(--muted)]">
-							DosSend | Everything on
-						</p>
-						<div className="space-y-5">
-							<h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-								Pro-grade transfers, scheduling, and analytics —{" "}
-								<span className="gradient-text">all free</span>.
-							</h1>
-							<p className="text-lg text-[color:var(--muted)] sm:max-w-2xl">
-								No meters, no paywalls. Ship massive files or smart links
-								with expiries, device locks, passcodes, custom domains, and
-								real-time threat monitoring. Designed for teams that move
-								fast.
-							</p>
-						</div>
-						<div className="flex flex-wrap gap-3 text-sm text-[color:var(--muted)]">
-							<div className="pill px-4 py-2 font-medium text-[color:var(--fg)]">
-								Unlimited premium controls
-							</div>
-							<div className="pill px-4 py-2 font-medium text-[color:var(--fg)]">
-								Vercel-ready · Prisma-backed
-							</div>
-							<div className="pill px-4 py-2 font-medium text-[color:var(--fg)]">
-								Dark + light, tech aesthetic
-							</div>
-						</div>
-						<div className="flex flex-wrap items-center gap-4">
-							<Link
-								href="/dashboard"
-								className="inline-flex items-center gap-2 rounded-xl bg-[color:var(--primary)] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[var(--primary)]/40 transition hover:translate-y-[-1px] hover:bg-[color:var(--primary-strong)]">
-								Authenticate & send
-								<ArrowUpRight size={16} />
-							</Link>
-							<Link
-								href="#features"
-								className="inline-flex items-center gap-2 rounded-xl border border-[color:var(--border)] px-5 py-3 text-sm font-semibold text-[color:var(--fg)] transition hover:border-[color:var(--primary)] hover:text-[color:var(--primary)]">
-								Explore the stack
-								<MousePointerClick size={16} />
-							</Link>
-						</div>
-						<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-							{[
-								"Unlimited sends",
-								"Passcodes + device locks",
-								"Custom domains",
-							].map((item) => (
-								<div
-									key={item}
-									className="glass rounded-xl px-4 py-3 text-sm font-semibold text-[color:var(--fg)]">
-									{item}
-								</div>
-							))}
-						</div>
-					</div>
+      {/* Hero Section */}
+      <section className="relative z-10 mx-auto max-w-7xl px-6 pt-16 pb-24">
+        <div className="grid lg:grid-cols-[1.2fr_1fr] gap-16 items-start">
+          {/* Left Content */}
+          <div className="space-y-8">
+            <Link href="#features" className="badge inline-flex group">
+              <span className="w-2 h-2 rounded-full bg-blue-500" />
+              ALL PREMIUM FEATURES — FREE FOREVER
+              <ArrowUpRight className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity" />
+            </Link>
 
-					<div className="glass relative overflow-hidden rounded-2xl border border-[color:var(--border)] px-6 py-6 shadow-2xl">
-						<div
-							className="absolute inset-0 bg-gradient-to-br from-[color:var(--primary)]/10 via-transparent to-[color:var(--accent)]/15"
-							aria-hidden
-						/>
-						<div className="relative flex flex-col gap-6">
-							<div className="flex items-center justify-between">
-								<div>
-									<p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted)]">
-										Live control
-									</p>
-									<h3 className="text-xl font-semibold">
-										Realtime guardrail
-									</h3>
-								</div>
-								<div className="pill px-3 py-1 text-xs font-semibold text-[color:var(--primary)]">
-									Zero cost
-								</div>
-							</div>
-							<div className="space-y-3 rounded-xl border border-[color:var(--border)] bg-[color:var(--card-strong)]/70 p-4">
-								<div className="flex items-center justify-between text-sm">
-									<span className="text-[color:var(--muted)]">
-										Status
-									</span>
-									<span className="text-[color:var(--success)]">
-										Secure · Passcode + device lock
-									</span>
-								</div>
-								<div className="fade-divider" />
-								<div className="flex items-center justify-between text-sm">
-									<span className="text-[color:var(--muted)]">
-										Expiry
-									</span>
-									<span className="text-[color:var(--fg)]">
-										View once · 24h fallback
-									</span>
-								</div>
-								<div className="flex items-center justify-between text-sm">
-									<span className="text-[color:var(--muted)]">
-										Devices
-									</span>
-									<span className="text-[color:var(--fg)]">
-										Macbook · iPhone · iPad
-									</span>
-								</div>
-								<div className="flex items-center justify-between text-sm">
-									<span className="text-[color:var(--muted)]">
-										Auto revoke
-									</span>
-									<span className="text-[color:var(--warning)]">
-										On suspicious access
-									</span>
-								</div>
-							</div>
-							<div className="grid grid-cols-2 gap-4 text-sm">
-								<div className="rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] px-4 py-3">
-									<p className="text-[color:var(--muted)]">Downloads</p>
-									<p className="text-2xl font-semibold">0 / ∞</p>
-									<p className="text-xs text-[color:var(--muted)]">
-										No caps or throttles
-									</p>
-								</div>
-								<div className="rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] px-4 py-3">
-									<p className="text-[color:var(--muted)]">
-										Custom domain
-									</p>
-									<p className="text-lg font-semibold">
-										send.yourbrand.com
-									</p>
-									<p className="text-xs text-[color:var(--muted)]">
-										Premium look by default
-									</p>
-								</div>
-							</div>
-							<div className="flex items-center justify-between rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] px-4 py-3 text-sm">
-								<div className="flex items-center gap-2 text-[color:var(--muted)]">
-									<Fingerprint size={16} />
-									Device lock active
-								</div>
-								<button className="text-[color:var(--primary)]">
-									Manage
-								</button>
-							</div>
-						</div>
-					</div>
-				</section>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-medium leading-[1.1] tracking-tight">
+              Share files with
+              <br />
+              <span className="text-[var(--muted)]">total control</span>
+            </h1>
 
-				<section id="features" className="space-y-8">
-					<div className="flex items-center justify-between">
-						<div>
-							<p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted)]">
-								Premium surface
-							</p>
-							<h2 className="text-2xl font-semibold">
-								Every DosSend feature, unlocked
-							</h2>
-						</div>
-						<Link
-							className="hidden text-sm text-[color:var(--primary)] sm:inline"
-							href="/dashboard">
-							Go to dashboard
-						</Link>
-					</div>
-					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-						{featureCards.map((feature) => (
-							<div
-								key={feature.title}
-								className="glass flex h-full flex-col gap-3 rounded-xl border border-[color:var(--border)] p-4 transition hover:border-[color:var(--primary)] hover:-translate-y-[1px]">
-								<div className="pill inline-flex w-fit items-center gap-2 px-3 py-1 text-xs font-semibold text-[color:var(--primary)]">
-									{feature.icon}
-									Feature
-								</div>
-								<h3 className="text-lg font-semibold">{feature.title}</h3>
-								<p className="text-sm text-[color:var(--muted)]">
-									{feature.description}
-								</p>
-							</div>
-						))}
-					</div>
-				</section>
+            <p className="text-lg text-[var(--muted)] max-w-lg leading-relaxed">
+              DocuNsend gives you everything DocSend charges $45/month for — 
+              password protection, analytics, device locking, custom domains — 
+              completely free. Forever.
+            </p>
 
-				<section className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
-					<div className="glass space-y-5 rounded-2xl border border-[color:var(--border)] p-6">
-						<p className="text-xs uppercase tracking-[0.28em] text-[color:var(--muted)]">
-							Workflow
-						</p>
-						<h3 className="text-xl font-semibold">Zero friction sending</h3>
-						<div className="grid gap-4 md:grid-cols-3">
-							{workflow.map((step, idx) => (
-								<div
-									key={step.title}
-									className="rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] p-4">
-									<div className="pill mb-3 inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-[color:var(--primary)]">
-										{idx + 1}
-										<Link2 size={14} />
-									</div>
-									<h4 className="text-base font-semibold">
-										{step.title}
-									</h4>
-									<p className="text-sm text-[color:var(--muted)]">
-										{step.description}
-									</p>
-								</div>
-							))}
-						</div>
-					</div>
+            <div className="flex flex-wrap items-center gap-4">
+              <Link href="/dashboard" className="btn btn-primary px-6 py-3">
+                Start sharing free
+              </Link>
+              <Link href="#compare" className="btn btn-secondary px-6 py-3">
+                Compare to DocSend
+              </Link>
+            </div>
+          </div>
 
-					<div className="glass space-y-4 rounded-2xl border border-[color:var(--border)] p-6">
-						<div className="flex items-center justify-between">
-							<h3 className="text-lg font-semibold">Security controls</h3>
-							<Lock size={18} />
-						</div>
-						<div className="space-y-3">
-							{security.map((item) => (
-								<div
-									key={item}
-									className="flex items-center gap-3 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] px-4 py-3 text-sm">
-									<ShieldCheck
-										size={16}
-										className="text-[color:var(--primary)]"
-									/>
-									<span>{item}</span>
-								</div>
-							))}
-						</div>
-					</div>
-				</section>
+          {/* Right - Floating Cards */}
+          <div className="relative hidden lg:block">
+            <div className="grid grid-cols-2 gap-4">
+              {floatingCards.map((card, i) => (
+                <div
+                  key={card.title}
+                  className="card p-4 space-y-3"
+                  style={{
+                    transform: `translateY(${i % 2 === 0 ? '0' : '20px'})`,
+                  }}
+                >
+                  <p className="text-xs font-medium text-[var(--muted)] tracking-wider">
+                    {card.title}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {card.items.map((item) => (
+                      <div
+                        key={item.name}
+                        className="aspect-square rounded-lg bg-[var(--bg-strong)] flex items-center justify-center text-xl"
+                        title={item.name}
+                      >
+                        {item.icon}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
-				<section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-					<div className="glass space-y-5 rounded-2xl border border-[color:var(--border)] p-6">
-						<div className="flex items-center gap-2 text-sm text-[color:var(--muted)]">
-							<Activity size={16} /> Live analytics
-						</div>
-						<h3 className="text-xl font-semibold">See everything in motion</h3>
-						<p className="text-sm text-[color:var(--muted)]">
-							Live opens, downloads, countries, devices, referrers, and blocked
-							attempts are captured per transfer. No limits, no hidden
-							dashboards.
-						</p>
-						<div className="rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] p-4">
-							<div className="flex items-center justify-between text-sm">
-								<span className="text-[color:var(--muted)]">Events</span>
-								<span className="text-[color:var(--fg)]">
-									Realtime stream
-								</span>
-							</div>
-							<div className="mt-3 space-y-2 text-sm">
-								{[
-									"Download allow · SF, Macbook",
-									"Blocked · VPN exit in RU",
-									"Open · NYC, iPhone",
-								].map((event) => (
-									<div
-										key={event}
-										className="flex items-center justify-between rounded-lg border border-[color:var(--border)] bg-[color:var(--card-strong)] px-3 py-2">
-										<span>{event}</span>
-										<ArrowUpRight size={14} />
-									</div>
-								))}
-							</div>
-						</div>
-					</div>
+      {/* Social Proof */}
+      <section className="relative z-10 border-t border-[var(--border)] py-8">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4 text-sm text-[var(--muted)]">
+            <span>Trusted by teams at:</span>
+            {logos.map((logo) => (
+              <span key={logo} className="font-medium text-[var(--fg)]">
+                {logo}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
 
-					<div className="glass space-y-5 rounded-2xl border border-[color:var(--border)] p-6">
-						<div className="pill inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold text-[color:var(--primary)]">
-							<Sparkles size={14} /> Pricing
-						</div>
-						<h3 className="text-xl font-semibold">Premium, but free</h3>
-						<p className="text-sm text-[color:var(--muted)]">
-							DosSend charges for these. We keep them open: scheduling,
-							analytics, device locks, custom domains, passcodes, revokes, and
-							more.
-						</p>
-						<div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] p-5 text-center">
-							<p className="text-5xl font-semibold">$0</p>
-							<p className="text-sm text-[color:var(--muted)]">
-								Every premium control included
-							</p>
-							<div className="mt-4 grid gap-2 text-sm text-left">
-								{[
-									"Unlimited transfers",
-									"Custom domains",
-									"Full analytics",
-									"Device + passcode locks",
-									"Scheduling and revoke",
-								].map((item) => (
-									<div key={item} className="flex items-center gap-2">
-										<ArrowUpRight
-											size={14}
-											className="text-[color:var(--primary)]"
-										/>
-										<span>{item}</span>
-									</div>
-								))}
-							</div>
-						</div>
-					</div>
-				</section>
+      {/* Features Grid */}
+      <section id="features" className="relative z-10 mx-auto max-w-7xl px-6 py-24">
+        <div className="text-center mb-16">
+          <p className="text-sm text-[var(--muted)] uppercase tracking-wider mb-4">
+            Features
+          </p>
+          <h2 className="text-4xl sm:text-5xl font-medium mb-4">
+            Everything you need.
+            <br />
+            <span className="text-[var(--muted)]">Nothing you don't.</span>
+          </h2>
+        </div>
 
-				<section
-					id="roadmap"
-					className="glass space-y-6 rounded-2xl border border-[color:var(--border)] p-6">
-					<div className="flex items-center justify-between">
-						<h3 className="text-xl font-semibold">On deck</h3>
-						<Link
-							href="/changelog"
-							className="text-sm text-[color:var(--primary)]">
-							View changelog
-						</Link>
-					</div>
-					<div className="grid gap-4 md:grid-cols-3">
-						{[
-							"Workspace roles",
-							"Recipient notifications",
-							"Webhook audit logs",
-						].map((item) => (
-							<div
-								key={item}
-								className="rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] p-4 text-sm">
-								<p className="font-semibold">{item}</p>
-								<p className="text-[color:var(--muted)]">
-									Planned and shipping soon.
-								</p>
-							</div>
-						))}
-					</div>
-				</section>
-			</div>
-		</main>
-	);
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {features.map((feature) => (
+            <div
+              key={feature.title}
+              className="card p-6 space-y-4 hover:bg-[var(--card-strong)] transition-colors"
+            >
+              <div className="w-10 h-10 rounded-lg bg-[var(--bg-strong)] flex items-center justify-center text-[var(--muted)]">
+                {feature.icon}
+              </div>
+              <h3 className="font-medium text-lg">{feature.title}</h3>
+              <p className="text-sm text-[var(--muted)] leading-relaxed">
+                {feature.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Comparison Section */}
+      <section id="compare" className="relative z-10 mx-auto max-w-7xl px-6 py-24">
+        <div className="card p-8 md:p-12">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <p className="text-sm text-[var(--muted)] uppercase tracking-wider mb-4">
+                Why switch?
+              </p>
+              <h2 className="text-3xl sm:text-4xl font-medium mb-6">
+                DocSend is $45/mo.
+                <br />
+                <span className="text-[var(--muted)]">We're $0.</span>
+              </h2>
+              <p className="text-[var(--muted)] mb-8 leading-relaxed">
+                DocSend locks basic security features behind expensive paywalls. 
+                We believe password protection and analytics should be free for everyone.
+              </p>
+              <Link href="/dashboard" className="btn btn-primary">
+                Switch to DocuNsend
+                <ArrowUpRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="space-y-4">
+              {[
+                { feature: "Password protection", them: "$15/mo", us: "Free" },
+                { feature: "Analytics", them: "$25/mo", us: "Free" },
+                { feature: "Custom domains", them: "Enterprise", us: "Free" },
+                { feature: "Device locking", them: "N/A", us: "Free" },
+                { feature: "View-once mode", them: "N/A", us: "Free" },
+              ].map((row) => (
+                <div
+                  key={row.feature}
+                  className="grid grid-cols-3 gap-4 py-3 border-b border-[var(--border)] last:border-0"
+                >
+                  <span className="font-medium">{row.feature}</span>
+                  <span className="text-center text-[var(--muted)]">{row.them}</span>
+                  <span className="text-center text-green-500 font-medium">{row.us}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="relative z-10 mx-auto max-w-7xl px-6 py-24">
+        <div className="text-center">
+          <h2 className="text-4xl sm:text-5xl font-medium mb-6">
+            Ready to stop overpaying?
+          </h2>
+          <p className="text-lg text-[var(--muted)] mb-8 max-w-xl mx-auto">
+            Join thousands of teams who switched to DocuNsend.
+            Same features. Zero cost.
+          </p>
+          <Link href="/dashboard" className="btn btn-primary px-8 py-4 text-base">
+            Get started — it's free
+            <ArrowUpRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="relative z-10 border-t border-[var(--border)] py-8">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[var(--muted)]">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-white flex items-center justify-center">
+                <Zap className="w-3 h-3 text-black" />
+              </div>
+              <span className="font-medium text-[var(--fg)]">DocuNsend</span>
+              <span>· Built different</span>
+            </div>
+            <div className="flex items-center gap-6">
+              <Link href="#" className="hover:text-[var(--fg)] transition-colors">
+                GitHub
+              </Link>
+              <Link href="#" className="hover:text-[var(--fg)] transition-colors">
+                Twitter
+              </Link>
+              <Link href="#" className="hover:text-[var(--fg)] transition-colors">
+                Privacy
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
 }
